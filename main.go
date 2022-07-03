@@ -13,6 +13,11 @@ import (
 func main() {
 	args := parseArgs()
 
+	// Exit early if no arguments were passed in
+	if len(args.Groups) <= 0 {
+		os.Exit(0)
+	}
+
 	git, err := gitlab.NewClient(args.GitlabToken, gitlab.WithBaseURL(args.GitlabUrl))
 	if err != nil {
 		log.Fatal(err)
