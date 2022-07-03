@@ -31,7 +31,6 @@ func main() {
 
 	for _, group := range args.Groups {
 		projects, response, err := git.Groups.ListGroupProjects(
-			// FIXME: Hard-coded only ever looking at the first group
 			group,
 			&gitlab.ListGroupProjectsOptions{
 				Archived:         gitlab.Bool(false),
