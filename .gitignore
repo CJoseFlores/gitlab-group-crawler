@@ -5,6 +5,9 @@
 *.so
 *.dylib
 
+# Resulting binary upon using `go build`
+gitlab-group-cralwer
+
 # Test binary, built with `go test -c`
 *.test
 
@@ -13,3 +16,6 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# Default generate project list file
+project-list.txt
