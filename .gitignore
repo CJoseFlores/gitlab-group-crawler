@@ -5,6 +5,9 @@
 *.so
 *.dylib
 
+# Resulting binary upon using `go build`
+gitlab-group-cralwer
+
 # Test binary, built with `go test -c`
 *.test
 
