@@ -85,26 +85,37 @@ func scanGroups(git *gitlab.Client, args ProgArgs) {
 
 	// List the projects for every specified group
 	for _, group := range args.Groups {
-		projects, response, err := git.Groups.ListGroupProjects(
-			group,
-			&gitlab.ListGroupProjectsOptions{
-				Archived:         gitlab.Bool(false),
-				IncludeSubGroups: gitlab.Bool(true),
-			},
-		)
 
-		if err != nil {
-			log.Fatal(err)
-		}
+		page := 1
+		for {
+			projects, response, err := git.Groups.ListGroupProjects(
+				group,
+				&gitlab.ListGroupProjectsOptions{
+					Archived:         gitlab.Bool(false),
+					IncludeSubGroups: gitlab.Bool(true),
+					ListOptions:      gitlab.ListOptions{PerPage: 100, Page: page},
+				},
+			)
 
-		if response.StatusCode != 200 {
-			log.Fatalf("Could not fetch groups (Code: %v)\n", response.StatusCode)
-		}
+			if err != nil {
+				log.Fatal(err)
+			}
+			if response.StatusCode != 200 {
+				log.Fatalf("Could not fetch groups (Code: %v)\n", response.StatusCode)
+			}
 
-		// Print out the list of discovered projects and write them to file
-		for _, project := range projects {
-			fmt.Println(project.PathWithNamespace)
-			outputFile.WriteString(project.PathWithNamespace + "\n")
+			// Print out the list of discovered projects and write them to file
+			for _, project := range projects {
+				fmt.Println(project.PathWithNamespace)
+				outputFile.WriteString(project.PathWithNamespace + "\n")
+			}
+
+			// Continue onto next page, or exit if we are on the last page
+			if page < response.TotalPages {
+				page = response.NextPage
+			} else {
+				break
+			}
 		}
 	}
 }
