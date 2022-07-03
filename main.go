@@ -47,27 +47,18 @@ func main() {
 				Destination: &args.GitlabUrl,
 			},
 			&cli.StringFlag{
-				Name:        "username",
+				Name:        "gitlab-token",
 				Required:    true,
-				Usage:       "the name of the account that has access to the groups to scan (REQUIRED)",
-				Aliases:     []string{"u"},
-				Destination: &args.Username,
-			},
-			&cli.StringFlag{
-				Name:        "password",
-				Required:    true,
-				Usage:       "the password of the account that has access to the groups to scan (REQUIRED)",
-				Aliases:     []string{"p"},
-				Destination: &args.Password,
+				Usage:       "a token of the account that has read access to the groups to scan (REQUIRED)",
+				Aliases:     []string{"t"},
+				Destination: &args.GitlabToken,
 			},
 		},
 		Action: func(ctx *cli.Context) error {
-			if ctx.Args().Len() != 1 {
-				return errors.New("the crawler currently only supports scanning 1 group")
+			if ctx.Args().Len() < 1 {
+				return errors.New("no groups provided")
 			}
-
-			fmt.Println("Argument: " + ctx.Args().First())
-			fmt.Println("Unimplemented")
+			args.Groups = ctx.Args().Slice()
 			return nil
 		},
 		EnableBashCompletion: true,
@@ -77,7 +68,24 @@ func main() {
 		log.Fatal(err)
 	}
 
-	git, err := gitlab.NewBasicAuthClient(args.Username, args.Password, gitlab.WithBaseURL("https://gitlab.com"))
-	fmt.Print(git.BaseURL(), err)
-	fmt.Println()
+	git, err := gitlab.NewClient(args.GitlabToken, gitlab.WithBaseURL(args.GitlabUrl))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	projects, response, err := git.Groups.ListGroupProjects(
+		// FIXME: Hard-coded only ever looking at the first group
+		args.Groups[0],
+		&gitlab.ListGroupProjectsOptions{
+			Archived:         gitlab.Bool(false),
+			IncludeSubGroups: gitlab.Bool(true),
+		},
+	)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(projects)
+	fmt.Println(response)
 }

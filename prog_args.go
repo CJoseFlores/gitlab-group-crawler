@@ -10,8 +10,8 @@ type ProgArgs struct {
 	OutputFileName string
 	// The URL of the gitlab instance (ex: https://gitlab.com)
 	GitlabUrl string
-	// The name of the account that has access to the groups to scan
-	Username string
-	// The password of the account that has access to the groups to scan
-	Password string
+	// The token of the account that has read access to the groups to scan
+	GitlabToken string
+	// The list of groups to scan
+	Groups []string
 }
