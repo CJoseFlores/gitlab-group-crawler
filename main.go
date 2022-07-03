@@ -23,35 +23,36 @@ func main() {
 		log.Fatal(err)
 	}
 
-	projects, response, err := git.Groups.ListGroupProjects(
-		// FIXME: Hard-coded only ever looking at the first group
-		args.Groups[0],
-		&gitlab.ListGroupProjectsOptions{
-			Archived:         gitlab.Bool(false),
-			IncludeSubGroups: gitlab.Bool(true),
-		},
-	)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if response.StatusCode != 200 {
-		log.Fatalf("Could not fetch groups (Code: %v)\n", response.StatusCode)
-	}
-
 	outputFile, err := os.Create(args.OutputFileName)
 	if err != nil {
 		fmt.Println("Could not create output file...", err)
 	}
 	defer outputFile.Close()
 
-	// Print out the list of discovered projects and write them to file
-	for _, project := range projects {
-		fmt.Println(project.PathWithNamespace)
-		outputFile.WriteString(project.PathWithNamespace + "\n")
-	}
+	for _, group := range args.Groups {
+		projects, response, err := git.Groups.ListGroupProjects(
+			// FIXME: Hard-coded only ever looking at the first group
+			group,
+			&gitlab.ListGroupProjectsOptions{
+				Archived:         gitlab.Bool(false),
+				IncludeSubGroups: gitlab.Bool(true),
+			},
+		)
 
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if response.StatusCode != 200 {
+			log.Fatalf("Could not fetch groups (Code: %v)\n", response.StatusCode)
+		}
+
+		// Print out the list of discovered projects and write them to file
+		for _, project := range projects {
+			fmt.Println(project.PathWithNamespace)
+			outputFile.WriteString(project.PathWithNamespace + "\n")
+		}
+	}
 }
 
 func parseArgs() ProgArgs {
