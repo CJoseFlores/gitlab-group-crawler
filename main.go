@@ -36,8 +36,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println(projects)
-	fmt.Println(response)
+	if response.StatusCode != 200 {
+		log.Fatalf("Could not fetch groups (Code: %v)\n", response.StatusCode)
+	}
+
+	for _, project := range projects {
+		fmt.Println(project.PathWithNamespace)
+	}
 }
 
 func parseArgs() ProgArgs {
