@@ -11,6 +11,31 @@ import (
 )
 
 func main() {
+	args := parseArgs()
+
+	git, err := gitlab.NewClient(args.GitlabToken, gitlab.WithBaseURL(args.GitlabUrl))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	projects, response, err := git.Groups.ListGroupProjects(
+		// FIXME: Hard-coded only ever looking at the first group
+		args.Groups[0],
+		&gitlab.ListGroupProjectsOptions{
+			Archived:         gitlab.Bool(false),
+			IncludeSubGroups: gitlab.Bool(true),
+		},
+	)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(projects)
+	fmt.Println(response)
+}
+
+func parseArgs() ProgArgs {
 	var args ProgArgs
 
 	app := &cli.App{
@@ -68,24 +93,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	git, err := gitlab.NewClient(args.GitlabToken, gitlab.WithBaseURL(args.GitlabUrl))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	projects, response, err := git.Groups.ListGroupProjects(
-		// FIXME: Hard-coded only ever looking at the first group
-		args.Groups[0],
-		&gitlab.ListGroupProjectsOptions{
-			Archived:         gitlab.Bool(false),
-			IncludeSubGroups: gitlab.Bool(true),
-		},
-	)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(projects)
-	fmt.Println(response)
+	return args
 }
