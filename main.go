@@ -63,19 +63,6 @@ func parseArgs() ProgArgs {
 		UsageText: "[global options] command [command options] [arguments...]" +
 			"\n\nThe list of arguments passed in are gitlab groups or subgroups you wish to scan recursively",
 		Flags: []cli.Flag{
-			&cli.BoolFlag{
-				Name:        "insecure",
-				Value:       false,
-				Usage:       "connect to gitlab without TLS verification",
-				Aliases:     []string{"k"},
-				Destination: &args.Insecure,
-			},
-			&cli.StringFlag{
-				Name:        "file-name",
-				Usage:       "the name of an existing file to diff against",
-				Aliases:     []string{"f"},
-				Destination: &args.InputFileName,
-			},
 			&cli.StringFlag{
 				Name:        "output-file-name",
 				Value:       "project-list.txt",
