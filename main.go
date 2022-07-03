@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/urfave/cli/v2"
+	"github.com/xanzy/go-gitlab"
 )
 
 func main() {
@@ -26,13 +27,6 @@ func main() {
 				Destination: &args.Insecure,
 			},
 			&cli.StringFlag{
-				Name:        "gitlab-url",
-				Value:       "https://gitlab.com/",
-				Usage:       "the URL of the gitlab instance to crawl",
-				Aliases:     []string{"g"},
-				Destination: &args.GitlabUrl,
-			},
-			&cli.StringFlag{
 				Name:        "file-name",
 				Usage:       "the name of an existing file to diff against",
 				Aliases:     []string{"f"},
@@ -44,6 +38,27 @@ func main() {
 				Usage:       "the name of the output file to generate",
 				Aliases:     []string{"o"},
 				Destination: &args.OutputFileName,
+			},
+			&cli.StringFlag{
+				Name:        "gitlab-url",
+				Value:       "https://gitlab.com/",
+				Usage:       "the URL of the gitlab instance to crawl",
+				Aliases:     []string{"g"},
+				Destination: &args.GitlabUrl,
+			},
+			&cli.StringFlag{
+				Name:        "username",
+				Required:    true,
+				Usage:       "the name of the account that has access to the groups to scan (REQUIRED)",
+				Aliases:     []string{"u"},
+				Destination: &args.Username,
+			},
+			&cli.StringFlag{
+				Name:        "password",
+				Required:    true,
+				Usage:       "the password of the account that has access to the groups to scan (REQUIRED)",
+				Aliases:     []string{"p"},
+				Destination: &args.Password,
 			},
 		},
 		Action: func(ctx *cli.Context) error {
@@ -61,4 +76,8 @@ func main() {
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
+
+	git, err := gitlab.NewBasicAuthClient(args.Username, args.Password, gitlab.WithBaseURL("https://gitlab.com"))
+	fmt.Print(git.BaseURL(), err)
+	fmt.Println()
 }
