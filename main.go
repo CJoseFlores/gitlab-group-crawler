@@ -23,37 +23,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	outputFile, err := os.Create(args.OutputFileName)
-	if err != nil {
-		fmt.Println("Could not create output file...", err)
-	}
-	defer outputFile.Close()
-
-	for _, group := range args.Groups {
-		projects, response, err := git.Groups.ListGroupProjects(
-			group,
-			&gitlab.ListGroupProjectsOptions{
-				Archived:         gitlab.Bool(false),
-				IncludeSubGroups: gitlab.Bool(true),
-			},
-		)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		if response.StatusCode != 200 {
-			log.Fatalf("Could not fetch groups (Code: %v)\n", response.StatusCode)
-		}
-
-		// Print out the list of discovered projects and write them to file
-		for _, project := range projects {
-			fmt.Println(project.PathWithNamespace)
-			outputFile.WriteString(project.PathWithNamespace + "\n")
-		}
-	}
+	scanGroups(git, args)
 }
 
+// Parses program arguments.
 func parseArgs() ProgArgs {
 	var args ProgArgs
 
@@ -100,4 +73,38 @@ func parseArgs() ProgArgs {
 	}
 
 	return args
+}
+
+// Scans the requested Gitlab groups and outputs a file with their paths.
+func scanGroups(git *gitlab.Client, args ProgArgs) {
+	outputFile, err := os.Create(args.OutputFileName)
+	if err != nil {
+		fmt.Println("Could not create output file...", err)
+	}
+	defer outputFile.Close()
+
+	// List the projects for every specified group
+	for _, group := range args.Groups {
+		projects, response, err := git.Groups.ListGroupProjects(
+			group,
+			&gitlab.ListGroupProjectsOptions{
+				Archived:         gitlab.Bool(false),
+				IncludeSubGroups: gitlab.Bool(true),
+			},
+		)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if response.StatusCode != 200 {
+			log.Fatalf("Could not fetch groups (Code: %v)\n", response.StatusCode)
+		}
+
+		// Print out the list of discovered projects and write them to file
+		for _, project := range projects {
+			fmt.Println(project.PathWithNamespace)
+			outputFile.WriteString(project.PathWithNamespace + "\n")
+		}
+	}
 }
