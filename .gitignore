@@ -16,3 +16,6 @@ gitlab-group-cralwer
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# Default generate project list file
+project-list.txt

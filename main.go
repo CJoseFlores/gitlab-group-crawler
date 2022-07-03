@@ -40,9 +40,18 @@ func main() {
 		log.Fatalf("Could not fetch groups (Code: %v)\n", response.StatusCode)
 	}
 
+	outputFile, err := os.Create(args.OutputFileName)
+	if err != nil {
+		fmt.Println("Could not create output file...", err)
+	}
+	defer outputFile.Close()
+
+	// Print out the list of discovered projects and write them to file
 	for _, project := range projects {
 		fmt.Println(project.PathWithNamespace)
+		outputFile.WriteString(project.PathWithNamespace + "\n")
 	}
+
 }
 
 func parseArgs() ProgArgs {
