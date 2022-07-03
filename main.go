@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -46,10 +47,11 @@ func main() {
 			},
 		},
 		Action: func(ctx *cli.Context) error {
-			if firstArg := ctx.Args().First(); firstArg != "" {
-				fmt.Println("Argument: " + firstArg)
+			if ctx.Args().Len() != 1 {
+				return errors.New("the crawler currently only supports scanning 1 group")
 			}
 
+			fmt.Println("Argument: " + ctx.Args().First())
 			fmt.Println("Unimplemented")
 			return nil
 		},
