@@ -10,6 +10,10 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
+// Holds the version of the program.
+// Should be set upon building via '-ldflags "-X main.version=VERSION"'
+var version string
+
 func main() {
 	args := parseArgs()
 
@@ -35,6 +39,7 @@ func parseArgs() ProgArgs {
 		Usage: "Prints out the names of projects underneath a GitLab group (recursively)",
 		UsageText: "[global options] command [command options] [arguments...]" +
 			"\n\nThe list of arguments passed in are gitlab groups or subgroups you wish to scan recursively",
+		Version: version,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "output-file-name",
