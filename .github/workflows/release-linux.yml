@@ -24,7 +24,7 @@ jobs:
       run: go test -v ./...
 
     - name: Rename Binary
-      run: "mv ./gitlab-group-crawler ./gitlab-group-crawler-${{ github.ref }}-linux-x86_64"
+      run: "mv gitlab-group-crawler gitlab-group-crawler-${{ github.ref }}-linux-x86_64"
 
     - name: Create a Release
       uses: marvinpinto/action-automatic-releases@v1.2.1
