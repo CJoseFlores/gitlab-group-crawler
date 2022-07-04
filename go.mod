@@ -1,4 +1,4 @@
-module gitlab-group-cralwer
+module gitlab-group-crawler
 
 go 1.18
 
